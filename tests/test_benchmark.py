@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-"""
-Performance benchmarks for polarsfit
-"""
+"""Performance benchmarks for polarsfit."""
 
 import os
 import time

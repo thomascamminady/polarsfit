@@ -1,24 +1,19 @@
 #!/usr/bin/env python3
-"""
-Comprehensive test suite for polarsfit
-"""
+"""Comprehensive test suite for polarsfit."""
 
-import os
-import tempfile
 from pathlib import Path
 
 import polars as pl
-import pytest
 
 import polarsfit
 
 
 class TestPolarsfit:
-    """Test class for polarsfit functionality"""
+    """Test class for polarsfit functionality."""
 
     @classmethod
     def setup_class(cls):
-        """Set up test fixtures"""
+        """Set up test fixtures."""
         cls.test_fit_file = Path("tests/data/30378-142636426.fit")
         cls.test_csv_file = Path(
             "tests/data/30378-Activity_2025-08-02_09-54_142636426.csv"
@@ -30,7 +25,7 @@ class TestPolarsfit:
         )
 
     def test_read_recordmesgs_basic(self):
-        """Test basic functionality of read_recordmesgs"""
+        """Test basic functionality of read_recordmesgs."""
         df = polarsfit.read_recordmesgs(str(self.test_fit_file))
 
         # Verify we get a DataFrame
@@ -45,7 +40,7 @@ class TestPolarsfit:
         )
 
     def test_read_recordmesgs_columns(self):
-        """Test that we get expected column names"""
+        """Test that we get expected column names."""
         df = polarsfit.read_recordmesgs(str(self.test_fit_file))
 
         # All columns should start with 'field_'
@@ -74,17 +69,10 @@ class TestPolarsfit:
         )
 
     def test_read_recordmesgs_data_types(self):
-        """Test that data types are correctly mapped"""
+        """Test that data types are correctly mapped."""
         df = polarsfit.read_recordmesgs(str(self.test_fit_file))
 
         # Check that we have the expected polars data types
-        expected_types = {
-            pl.UInt32,
-            pl.Int32,
-            pl.Float32,
-            pl.Float64,
-            pl.String,
-        }
         actual_types = set(df.dtypes)
 
         # Should have at least numeric types
@@ -97,7 +85,7 @@ class TestPolarsfit:
         print(f"✅ Data types test passed: {actual_types}")
 
     def test_read_recordmesgs_timestamp_field(self):
-        """Test timestamp field specifically"""
+        """Test timestamp field specifically."""
         df = polarsfit.read_recordmesgs(str(self.test_fit_file))
 
         if "field_253" in df.columns:
@@ -132,7 +120,7 @@ class TestPolarsfit:
             )
 
     def test_read_recordmesgs_gps_coordinates(self):
-        """Test GPS coordinate fields"""
+        """Test GPS coordinate fields."""
         df = polarsfit.read_recordmesgs(str(self.test_fit_file))
 
         lat_field = "field_0"  # position_lat in semicircles
@@ -161,7 +149,7 @@ class TestPolarsfit:
             )
 
     def test_read_recordmesgs_heart_rate(self):
-        """Test heart rate field"""
+        """Test heart rate field."""
         df = polarsfit.read_recordmesgs(str(self.test_fit_file))
 
         hr_field = "field_3"  # heart_rate
@@ -194,7 +182,7 @@ class TestPolarsfit:
                 )
 
     def test_read_recordmesgs_distance_field(self):
-        """Test distance field"""
+        """Test distance field."""
         df = polarsfit.read_recordmesgs(str(self.test_fit_file))
 
         distance_field = "field_5"  # distance
@@ -230,14 +218,14 @@ class TestPolarsfit:
         pass
 
     def test_read_recordmesgs_empty_results(self):
-        """Test behavior with FIT files that might have no record messages"""
+        """Test behavior with FIT files that might have no record messages."""
         # For now, just test that our known file has record messages
         df = polarsfit.read_recordmesgs(str(self.test_fit_file))
         assert df.shape[0] > 0, "Test file should have record messages"
         print("✅ Non-empty results test passed")
 
     def test_read_recordmesgs_field_consistency(self):
-        """Test that all columns have the same number of rows"""
+        """Test that all columns have the same number of rows."""
         df = polarsfit.read_recordmesgs(str(self.test_fit_file))
 
         # All columns should have the same length
@@ -253,7 +241,7 @@ class TestPolarsfit:
         )
 
     def test_fit_protocol_compliance(self):
-        """Test compliance with FIT protocol specifications"""
+        """Test compliance with FIT protocol specifications."""
         df = polarsfit.read_recordmesgs(str(self.test_fit_file))
 
         # According to FIT protocol, Record messages (mesg_num = 20 / 0x14) should have:
@@ -289,7 +277,7 @@ class TestPolarsfit:
 
 
 def test_compare_with_csv_if_available():
-    """Compare FIT parsing with CSV data if available"""
+    """Compare FIT parsing with CSV data if available."""
     test_fit_file = Path("tests/data/30378-142636426.fit")
     test_csv_file = Path(
         "tests/data/30378-Activity_2025-08-02_09-54_142636426.csv"
@@ -319,7 +307,7 @@ def test_compare_with_csv_if_available():
 
 
 def test_field_mapping_accuracy():
-    """Test accuracy of field number mapping"""
+    """Test accuracy of field number mapping."""
     df = polarsfit.read_recordmesgs(str(Path("tests/data/30378-142636426.fit")))
 
     # Based on FIT protocol documentation, common Record message fields:

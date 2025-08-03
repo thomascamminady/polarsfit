@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-"""
-Test runner for polarsfit with comprehensive reporting.
-"""
+"""Test runner for polarsfit with comprehensive reporting."""
 
 import subprocess
 import sys

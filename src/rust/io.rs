@@ -9,29 +9,29 @@ use std::collections::HashMap;
 #[pyfunction]
 pub fn read_recordmesgs(file_path: &str) -> PyResult<PyDataFrame> {
     let path = PathBuf::from(file_path);
-    
+
     // Parse the FIT file
     let fit = Fit::new(&path);
-    
+
     // Prepare data structures for DataFrame construction
     let mut columns: HashMap<String, Vec<AnyValue>> = HashMap::new();
     let mut column_order = Vec::new();
-    
+
     // Process each message in the FIT file
     for message in fit {
         // Only process record messages (typical for activity data)
         if format!("{:?}", message.kind).to_lowercase() == "record" {
-            
+
             // Iterate through all data fields in this record message
             for field in &message.values {
                 let field_name = format!("field_{}", field.field_num);
-                
+
                 // Initialize column if not exists
                 if !columns.contains_key(&field_name) {
                     columns.insert(field_name.clone(), Vec::new());
                     column_order.push(field_name.clone());
                 }
-                
+
                 // Convert field value to AnyValue
                 let any_value = match &field.value {
                     Value::U8(v) => AnyValue::UInt32(*v as u32),
@@ -72,12 +72,12 @@ pub fn read_recordmesgs(file_path: &str) -> PyResult<PyDataFrame> {
                         AnyValue::StringOwned(format!("[{}]", array_str).into())
                     },
                 };
-                
+
                 columns.get_mut(&field_name).unwrap().push(any_value);
             }
         }
     }
-    
+
     // Ensure all columns have the same length (fill with nulls if necessary)
     let max_len = columns.values().map(|v| v.len()).max().unwrap_or(0);
     for (_, column_data) in columns.iter_mut() {
@@ -85,7 +85,7 @@ pub fn read_recordmesgs(file_path: &str) -> PyResult<PyDataFrame> {
             column_data.push(AnyValue::Null);
         }
     }
-    
+
     // Create DataFrame
     let mut df_columns = Vec::new();
     for col_name in &column_order {
@@ -95,9 +95,9 @@ pub fn read_recordmesgs(file_path: &str) -> PyResult<PyDataFrame> {
             df_columns.push(series.into());
         }
     }
-    
+
     let df = DataFrame::new(df_columns)
         .map_err(|e| PyErr::new::<pyo3::exceptions::PyValueError, _>(format!("Failed to create DataFrame: {}", e)))?;
-    
+
     Ok(PyDataFrame(df))
 }

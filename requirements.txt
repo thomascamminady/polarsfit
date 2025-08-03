@@ -189,6 +189,20 @@ matplotlib-inline==0.1.7 \
     # via
     #   ipykernel
     #   ipython
+maturin==1.9.2 \
+    --hash=sha256:029572e692af5bac4f58586f294883732b14d41abb3ba83a587a9c68c6824a2a \
+    --hash=sha256:09750de66dce2ae04ad3ac7df1266dfe77abdcf84b7b6cbe43a41cd7e89cf958 \
+    --hash=sha256:0fe1480ac341b9ca733fdbf16a499fd2771e797819de416b5a47846ed0f8a17d \
+    --hash=sha256:1df15e896b3a05396a91ec2e60295bd70075f984736b8c84e8b14941bcba40c8 \
+    --hash=sha256:234b8cb12f14173452d71293c7ec86998b2d1c9f247b66023aa8b306d288817c \
+    --hash=sha256:58d69b388e52e93f43d25429afccaf4d1b04bb94606d46ddb21f7a97003ec174 \
+    --hash=sha256:8b534d3a8acb922fc7a01ec89c12ba950dccdc11b57457c1d4c2661ae24bf96d \
+    --hash=sha256:8dc091e8d98a9f7b8740b151f79685f43f305aa5ec444dbb3e49cacc036eb991 \
+    --hash=sha256:8f5d448b58c67ba8ef62c066ca02cf154557f2df20791d63e392e08e7721a03b \
+    --hash=sha256:95a08e849fda883e1a961218b7834af6f128eb9fc9ace4b90b65031da6028251 \
+    --hash=sha256:b2b12e88f5e3145cc4d749a1fb8958a83842f647c459112e9a8d75285521798f \
+    --hash=sha256:b7dc9a38089bbd1ac93d9046a9db14a41d011efdb7d6059bb557ebd97ab207e7 \
+    --hash=sha256:ee768507f25da3ae8e18d2fb2e430a44552b3192a40d3ab1eae3f4a67f5792b5
 mdurl==0.1.2 \
     --hash=sha256:84008a41e51615a49fc9966191ff91509e3c40b939176e643fd50a5c2196b8f8 \
     --hash=sha256:bb413d29f5eea38f31dd4754dd7377d4465116fb207585f97bf925588687c1ba
@@ -221,6 +235,15 @@ pluggy==1.6.0 \
     # via
     #   pytest
     #   pytest-cov
+polars==1.32.0 \
+    --hash=sha256:0397fc2501a5d5f1bb3fe8d27e0c26c7a5349b4110157c0fb7833cd3f5921c9e \
+    --hash=sha256:13af55890734f89b76016a395fb2e7460e7d9feecf50ed2f55cf0f05a1c0c991 \
+    --hash=sha256:8bf14c16164839e62c741a863942a94a9a463db21e797452fca996c8afaf8827 \
+    --hash=sha256:94f7c6a3b30bc99bc6b682ea42bb1ae983e33a302ca21aacbac50ae19e34fcf2 \
+    --hash=sha256:b01045981c0f23eeccfbfc870b782f93e73b74b29212fdfc8aae0be9024bc1fb \
+    --hash=sha256:dd84e24422509e1ec9be46f67f758d0bd9944d1ae4eacecee4f53adaa8ecd822 \
+    --hash=sha256:f4c15adb97d44766d30c759f5cebbdb64d361e8349ef10b5afc7413f71bf4b72
+    # via polarsfit
 prompt-toolkit==3.0.51 \
     --hash=sha256:52742911fde84e2d423e2f9a4cf1de7d7ac4e51958f648d9540e0fb8db077b07 \
     --hash=sha256:931a162e3b27fc90c86f1b48bb1fb2c528c2761475e57c9c06de13311c7b54ed
@@ -243,6 +266,10 @@ pure-eval==0.2.3 \
     --hash=sha256:1db8e35b67b3d218d818ae653e27f06c3aa420901fa7b081ca98cbedc874e0d0 \
     --hash=sha256:5f4e983f40564c576c7c8635ae88db5956bb2229d7e9237d03b3c0b0190eaf42
     # via stack-data
+py-cpuinfo==9.0.0 \
+    --hash=sha256:3cdbbf3fac90dc6f118bfd64384f309edeadd902d7c8fb17f02ffa1fc3f49690 \
+    --hash=sha256:859625bc251f64e21f077d099d4162689c762b5d6a4c3c97553d56241c9674d5
+    # via pytest-benchmark
 pycparser==2.22 ; implementation_name == 'pypy' \
     --hash=sha256:491c8be9c040f5390f5bf44a5b07752bd07f56edf992381b05c701439eec10f6 \
     --hash=sha256:c3702b6d3dd8c7abc1afa565d7e63d53a1d0bd86cdc24edd75470f4de499cfcc
@@ -258,7 +285,12 @@ pygments==2.19.2 \
 pytest==8.4.1 \
     --hash=sha256:539c70ba6fcead8e78eebbf1115e8b589e7565830d7d006a8723f19ac8a0afb7 \
     --hash=sha256:7c67fd69174877359ed9371ec3af8a3d2b04741818c51e5e99cc1742251fa93c
-    # via pytest-cov
+    # via
+    #   pytest-benchmark
+    #   pytest-cov
+pytest-benchmark==5.1.0 \
+    --hash=sha256:922de2dfa3033c227c96da942d1878191afa135a29485fb942e85dff1c592c89 \
+    --hash=sha256:9ea661cdc292e8231f7cd4c10b0319e56a2118e2c09d9f50e1b3d150d2aca105
 pytest-cov==6.2.1 \
     --hash=sha256:25cc6cc0a5358204b8108ecedc51a9b57b34cc6b8c967cc2c01a4e00d8a67da2 \
     --hash=sha256:f5bc4c23f42f1cdd23c70b1dab1bbaef4fc505ba950d53e0081d0730dd7e86d5

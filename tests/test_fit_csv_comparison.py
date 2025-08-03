@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
 Comprehensive test comparing FIT and CSV data.
+
 Tests that the FIT file parsing matches the corresponding CSV export.
 """
 
@@ -235,7 +236,7 @@ class TestFitCsvComparison:
     def test_field_coverage(self):
         """Test that mapped fields exist in FIT data."""
         missing_fields = []
-        for fit_field, csv_field in self.field_mapping.items():
+        for fit_field, _csv_field in self.field_mapping.items():
             if fit_field not in self.df_fit.columns:
                 missing_fields.append(fit_field)
 

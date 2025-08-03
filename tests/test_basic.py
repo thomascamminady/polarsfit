@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 
-import polars as pl
 
 import polarsfit
 
 
 def test_read_recordmesgs():
-    """Test reading record messages from a .fit file"""
+    """Test reading record messages from a .fit file."""
     try:
         # Use the existing .fit file in the tests/data directory
         fit_file = "tests/data/30378-142636426.fit"

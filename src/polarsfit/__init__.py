@@ -10,7 +10,6 @@ from polarsfit._internal import get_message_types as _get_message_types
 from polarsfit._internal import read_data as _read_data
 from polarsfit._internal import read_recordmesgs as _read_recordmesgs
 from polarsfit.fields import (
-    RECORD_FIELDS,
     MessageType,
     get_available_message_types,
     get_field_mapping,
@@ -21,7 +20,7 @@ def read_recordmesgs(
     file_path: str,
     field_mapping: dict[str, str] | None = None,
     *,
-    apply_default_mapping: bool = True,
+    apply_default_mapping: bool = False,
 ) -> pl.DataFrame:
     """
     Read record messages from a FIT file.
@@ -53,22 +52,38 @@ def read_recordmesgs(
     >>> # Read without any field mapping (raw field numbers)
     >>> df = polarsfit.read_recordmesgs("workout.fit", apply_default_mapping=False)
     """
-    # Build field mapping
-    final_mapping = {}
+    # Get raw data from Rust (with field_X column names)
+    df = _read_recordmesgs(file_path)
 
-    if apply_default_mapping:
-        # Apply default RECORD field mapping
-        default_mapping = {f"field_{k}": v for k, v in RECORD_FIELDS.items()}
-        final_mapping.update(default_mapping)
+    # Apply field mapping by renaming columns
+    if apply_default_mapping or field_mapping:
+        # Build field mapping
+        final_mapping = {}
 
-    if field_mapping:
-        # Apply custom mapping (overrides default)
-        final_mapping.update(field_mapping)
+        if apply_default_mapping:
+            # Apply default RECORD field mapping (lazy import to avoid circular import)
+            from polarsfit.fields import RECORD_FIELDS
 
-    # Convert to format expected by Rust, or pass None if empty
-    rust_mapping = final_mapping if final_mapping else None
+            # RECORD_FIELDS already has keys in format field_X -> field_name
+            final_mapping.update(RECORD_FIELDS)
 
-    return _read_recordmesgs(file_path, rust_mapping)
+        if field_mapping:
+            # Apply custom mapping (overrides default)
+            final_mapping.update(field_mapping)
+
+        # Rename columns that have mappings
+        if final_mapping:
+            # Only rename columns that exist in the DataFrame
+            existing_columns = set(df.columns)
+            rename_mapping = {
+                col: new_name
+                for col, new_name in final_mapping.items()
+                if col in existing_columns
+            }
+            if rename_mapping:
+                df = df.rename(rename_mapping)
+
+    return df
 
 
 def get_message_types(file_path: str) -> list[str]:
@@ -167,7 +182,27 @@ __all__ = [
     "get_message_types",
     "read_data",
     "MessageType",
-    "RECORD_FIELDS",
     "get_field_mapping",
     "get_available_message_types",
 ]
+
+
+def __getattr__(name: str):
+    """Lazy import for RECORD_FIELDS and other field constants to avoid circular imports."""
+    if name == "RECORD_FIELDS":
+        from polarsfit.fields import RECORD_FIELDS
+
+        return RECORD_FIELDS
+    elif name == "SESSION_FIELDS":
+        from polarsfit.fields import SESSION_FIELDS
+
+        return SESSION_FIELDS
+    elif name == "LAP_FIELDS":
+        from polarsfit.fields import LAP_FIELDS
+
+        return LAP_FIELDS
+    elif name == "ACTIVITY_FIELDS":
+        from polarsfit.fields import ACTIVITY_FIELDS
+
+        return ACTIVITY_FIELDS
+    raise AttributeError(f"module '{__name__}' has no attribute '{name}'")

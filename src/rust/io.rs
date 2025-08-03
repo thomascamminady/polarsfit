@@ -18,14 +18,14 @@ pub fn read_recordmesgs(file_path: &str, field_mapping: Option<HashMap<String, S
 pub fn get_message_types(file_path: &str) -> PyResult<Vec<String>> {
     let path = PathBuf::from(file_path);
     let fit = Fit::new(&path);
-    
+
     let mut message_types = std::collections::HashSet::new();
-    
+
     for message in fit {
         let msg_type = format!("{:?}", message.kind).to_lowercase();
         message_types.insert(msg_type);
     }
-    
+
     let mut result: Vec<String> = message_types.into_iter().collect();
     result.sort();
     Ok(result)
@@ -58,7 +58,7 @@ fn read_generic_messages(file_path: &str, message_type: &str, field_mapping: Opt
             // Iterate through all data fields in this message
             for field in &message.values {
                 let raw_field_name = format!("field_{}", field.field_num);
-                
+
                 // Apply field mapping if provided
                 let field_name = if let Some(ref mapping) = field_mapping {
                     mapping.get(&raw_field_name).cloned().unwrap_or(raw_field_name)

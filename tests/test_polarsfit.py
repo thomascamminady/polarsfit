@@ -135,17 +135,29 @@ class TestPolarsfit:
             lat_degrees = lat_series * 180.0 / (2**31)
             lon_degrees = lon_series * 180.0 / (2**31)
 
+            # Check for valid data before testing ranges
+            lat_min = lat_degrees.min()
+            lat_max = lat_degrees.max()
+            lon_min = lon_degrees.min()
+            lon_max = lon_degrees.max()
+
+            # Ensure we have valid coordinate data
+            assert lat_min is not None, "Latitude data should not be empty"
+            assert lat_max is not None, "Latitude data should not be empty"
+            assert lon_min is not None, "Longitude data should not be empty"
+            assert lon_max is not None, "Longitude data should not be empty"
+
             # Basic sanity checks for Earth coordinates
-            assert lat_degrees.min() >= -90, "Latitude should be >= -90"
-            assert lat_degrees.max() <= 90, "Latitude should be <= 90"
-            assert lon_degrees.min() >= -180, "Longitude should be >= -180"
-            assert lon_degrees.max() <= 180, "Longitude should be <= 180"
+            assert lat_min >= -90, f"Latitude should be >= -90, got {lat_min}"
+            assert lat_max <= 90, f"Latitude should be <= 90, got {lat_max}"
+            assert lon_min >= -180, f"Longitude should be >= -180, got {lon_min}"
+            assert lon_max <= 180, f"Longitude should be <= 180, got {lon_max}"
 
             print(
-                f"✅ GPS test passed: Lat range {lat_degrees.min():.6f} to {lat_degrees.max():.6f}"
+                f"✅ GPS test passed: Lat range {lat_min:.6f} to {lat_max:.6f}"
             )
             print(
-                f"                    Lon range {lon_degrees.min():.6f} to {lon_degrees.max():.6f}"
+                f"                    Lon range {lon_min:.6f} to {lon_max:.6f}"
             )
 
     def test_read_recordmesgs_heart_rate(self):

@@ -150,7 +150,9 @@ class TestPolarsfit:
             # Basic sanity checks for Earth coordinates
             assert lat_min >= -90, f"Latitude should be >= -90, got {lat_min}"
             assert lat_max <= 90, f"Latitude should be <= 90, got {lat_max}"
-            assert lon_min >= -180, f"Longitude should be >= -180, got {lon_min}"
+            assert lon_min >= -180, (
+                f"Longitude should be >= -180, got {lon_min}"
+            )
             assert lon_max <= 180, f"Longitude should be <= 180, got {lon_max}"
 
             print(

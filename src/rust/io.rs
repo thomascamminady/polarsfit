@@ -6,8 +6,41 @@ use fit::{Fit, Value};
 use std::collections::HashMap;
 
 /// Read record messages from a .fit file and return as a Polars DataFrame
+/// with optional field mapping
 #[pyfunction]
-pub fn read_recordmesgs(file_path: &str) -> PyResult<PyDataFrame> {
+#[pyo3(signature = (file_path, field_mapping = None))]
+pub fn read_recordmesgs(file_path: &str, field_mapping: Option<HashMap<String, String>>) -> PyResult<PyDataFrame> {
+    read_generic_messages(file_path, "record", field_mapping)
+}
+
+/// Get all available message types in a FIT file
+#[pyfunction]
+pub fn get_message_types(file_path: &str) -> PyResult<Vec<String>> {
+    let path = PathBuf::from(file_path);
+    let fit = Fit::new(&path);
+    
+    let mut message_types = std::collections::HashSet::new();
+    
+    for message in fit {
+        let msg_type = format!("{:?}", message.kind).to_lowercase();
+        message_types.insert(msg_type);
+    }
+    
+    let mut result: Vec<String> = message_types.into_iter().collect();
+    result.sort();
+    Ok(result)
+}
+
+/// Read messages of a specific type from a .fit file and return as a Polars DataFrame
+/// with optional field mapping
+#[pyfunction]
+#[pyo3(signature = (file_path, message_type, field_mapping = None))]
+pub fn read_data(file_path: &str, message_type: &str, field_mapping: Option<HashMap<String, String>>) -> PyResult<PyDataFrame> {
+    read_generic_messages(file_path, message_type, field_mapping)
+}
+
+/// Internal function to read generic messages from a FIT file
+fn read_generic_messages(file_path: &str, message_type: &str, field_mapping: Option<HashMap<String, String>>) -> PyResult<PyDataFrame> {
     let path = PathBuf::from(file_path);
 
     // Parse the FIT file
@@ -19,12 +52,19 @@ pub fn read_recordmesgs(file_path: &str) -> PyResult<PyDataFrame> {
 
     // Process each message in the FIT file
     for message in fit {
-        // Only process record messages (typical for activity data)
-        if format!("{:?}", message.kind).to_lowercase() == "record" {
+        // Only process messages of the specified type
+        if format!("{:?}", message.kind).to_lowercase() == message_type.to_lowercase() {
 
-            // Iterate through all data fields in this record message
+            // Iterate through all data fields in this message
             for field in &message.values {
-                let field_name = format!("field_{}", field.field_num);
+                let raw_field_name = format!("field_{}", field.field_num);
+                
+                // Apply field mapping if provided
+                let field_name = if let Some(ref mapping) = field_mapping {
+                    mapping.get(&raw_field_name).cloned().unwrap_or(raw_field_name)
+                } else {
+                    raw_field_name
+                };
 
                 // Initialize column if not exists
                 if !columns.contains_key(&field_name) {

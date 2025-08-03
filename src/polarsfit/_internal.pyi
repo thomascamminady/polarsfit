@@ -1,6 +1,5 @@
 """Type stubs for the internal Rust module."""
 
-
 import polars as pl
 
 def read_recordmesgs(file_path: str) -> pl.DataFrame:

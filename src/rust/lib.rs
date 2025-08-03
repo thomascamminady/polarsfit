@@ -3,10 +3,12 @@ use pyo3::prelude::*;
 mod expressions;
 mod io;
 
-use io::read_recordmesgs;
+use io::{read_recordmesgs, get_message_types, read_data};
 
 #[pymodule]
 fn _internal(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(read_recordmesgs, m)?)?;
+    m.add_function(wrap_pyfunction!(get_message_types, m)?)?;
+    m.add_function(wrap_pyfunction!(read_data, m)?)?;
     Ok(())
 }

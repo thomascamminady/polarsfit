@@ -4,6 +4,170 @@
    :start-line: 1
 """
 
-from polarsfit._internal import read_recordmesgs
+import polars as pl
 
-__all__ = ["read_recordmesgs"]
+from polarsfit._internal import get_message_types as _get_message_types
+from polarsfit._internal import read_data as _read_data
+from polarsfit._internal import read_recordmesgs as _read_recordmesgs
+from polarsfit.fields import (
+    RECORD_FIELDS,
+    MessageType,
+    get_available_message_types,
+    get_field_mapping,
+)
+
+
+def read_recordmesgs(
+    file_path: str,
+    field_mapping: dict[str, str] | None = None,
+    *,
+    apply_default_mapping: bool = True,
+) -> pl.DataFrame:
+    """
+    Read record messages from a FIT file.
+
+    Parameters
+    ----------
+    file_path : str
+        Path to the FIT file.
+    field_mapping : dict[str, str] | None, optional
+        Custom mapping from field numbers to field names.
+        Format: {"field_123": "custom_name"}
+    apply_default_mapping : bool, default True
+        Whether to apply the default FIT protocol field mapping.
+
+    Returns
+    -------
+    polars.DataFrame
+        DataFrame containing the record messages with mapped field names.
+
+    Examples
+    --------
+    >>> # Read with default field mapping
+    >>> df = polarsfit.read_recordmesgs("workout.fit")
+    >>>
+    >>> # Read with custom field mapping
+    >>> custom_mapping = {"field_123": "my_custom_field"}
+    >>> df = polarsfit.read_recordmesgs("workout.fit", field_mapping=custom_mapping)
+    >>>
+    >>> # Read without any field mapping (raw field numbers)
+    >>> df = polarsfit.read_recordmesgs("workout.fit", apply_default_mapping=False)
+    """
+    # Build field mapping
+    final_mapping = {}
+
+    if apply_default_mapping:
+        # Apply default RECORD field mapping
+        default_mapping = {f"field_{k}": v for k, v in RECORD_FIELDS.items()}
+        final_mapping.update(default_mapping)
+
+    if field_mapping:
+        # Apply custom mapping (overrides default)
+        final_mapping.update(field_mapping)
+
+    # Convert to format expected by Rust, or pass None if empty
+    rust_mapping = final_mapping if final_mapping else None
+
+    return _read_recordmesgs(file_path, rust_mapping)
+
+
+def get_message_types(file_path: str) -> list[str]:
+    """
+    Get all message types available in a FIT file.
+
+    Parameters
+    ----------
+    file_path : str
+        Path to the FIT file.
+
+    Returns
+    -------
+    list[str]
+        List of message type names found in the file.
+
+    Examples
+    --------
+    >>> message_types = polarsfit.get_message_types("workout.fit")
+    >>> print(message_types)
+    ['record', 'session', 'lap', 'file_id', 'event']
+    """
+    return _get_message_types(file_path)
+
+
+def read_data(
+    file_path: str,
+    message_type: str,
+    field_mapping: dict[str, str] | None = None,
+    *,
+    apply_default_mapping: bool = True,
+) -> pl.DataFrame:
+    """
+    Read messages of a specific type from a FIT file.
+
+    Parameters
+    ----------
+    file_path : str
+        Path to the FIT file.
+    message_type : str
+        Type of messages to read (e.g., 'record', 'session', 'lap').
+    field_mapping : dict[str, str] | None, optional
+        Custom mapping from field numbers to field names.
+        Format: {"field_123": "custom_name"}
+    apply_default_mapping : bool, default True
+        Whether to apply the default FIT protocol field mapping for this message type.
+
+    Returns
+    -------
+    polars.DataFrame
+        DataFrame containing the specified message type with mapped field names.
+
+    Examples
+    --------
+    >>> # Read session data with default mapping
+    >>> sessions = polarsfit.read_data("workout.fit", "session")
+    >>>
+    >>> # Read lap data with custom mapping
+    >>> custom_mapping = {"field_123": "my_custom_field"}
+    >>> laps = polarsfit.read_data("workout.fit", "lap", field_mapping=custom_mapping)
+    >>>
+    >>> # Get available message types first
+    >>> types = polarsfit.get_message_types("workout.fit")
+    >>> for msg_type in types:
+    ...     data = polarsfit.read_data("workout.fit", msg_type)
+    ...     print(f"{msg_type}: {data.shape}")
+    """
+    # Build field mapping
+    final_mapping = {}
+
+    if apply_default_mapping:
+        # Try to get default mapping for this message type
+        try:
+            msg_type_enum = getattr(MessageType, message_type.upper())
+            default_fields = get_field_mapping(msg_type_enum)
+            default_mapping = {
+                f"field_{k}": v for k, v in default_fields.items()
+            }
+            final_mapping.update(default_mapping)
+        except (AttributeError, KeyError):
+            # No default mapping available for this message type
+            pass
+
+    if field_mapping:
+        # Apply custom mapping (overrides default)
+        final_mapping.update(field_mapping)
+
+    # Convert to format expected by Rust, or pass None if empty
+    rust_mapping = final_mapping if final_mapping else None
+
+    return _read_data(file_path, message_type, rust_mapping)
+
+
+__all__ = [
+    "read_recordmesgs",
+    "get_message_types",
+    "read_data",
+    "MessageType",
+    "RECORD_FIELDS",
+    "get_field_mapping",
+    "get_available_message_types",
+]

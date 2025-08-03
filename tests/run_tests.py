@@ -37,7 +37,9 @@ def run_test_suite():
     ]
 
     try:
-        result = subprocess.run(cmd, capture_output=True, text=True, check=False)  # noqa: S603
+        result = subprocess.run(
+            cmd, capture_output=True, text=True, check=False
+        )  # noqa: S603
 
         # Print results
         print(result.stdout)

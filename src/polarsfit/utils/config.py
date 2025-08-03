@@ -26,6 +26,4 @@ class Config:
     # Define the log formats for shell and file handlers
     # These formats determine how the log messages will be formatted
     logger_shell_fmt: str = "%(message)s"
-    logger_file_fmt: (
-        str
-    ) = "%(levelname)s %(asctime)s [%(filename)s:%(funcName)s:%(lineno)d] \t%(message)s"
+    logger_file_fmt: str = "%(levelname)s %(asctime)s [%(filename)s:%(funcName)s:%(lineno)d] \t%(message)s"

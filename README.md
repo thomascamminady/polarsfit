@@ -164,4 +164,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 This package was created with [`cookiecutter`](https://github.com/audreyr/cookiecutter) and [`thomascamminady/cookiecutter-pypackage`](https://github.com/thomascamminady/cookiecutter-pypackage), a fork of [`audreyr/cookiecutter-pypackage`](https://github.com/audreyr/cookiecutter-pypackage).
 
 Find this repository on [GitHub](https://github.com/thomascamminady/polarsfit) or check out the [documentation](https://thomascamminady.github.io/polarsfit).
+
+```
+
 ```

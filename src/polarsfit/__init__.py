@@ -20,7 +20,7 @@ def read_recordmesgs(
     file_path: str,
     field_mapping: dict[str, str] | None = None,
     *,
-    apply_default_mapping: bool = False,
+    apply_default_mapping: bool = True,
 ) -> pl.DataFrame:
     """
     Read record messages from a FIT file.

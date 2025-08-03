@@ -21,3 +21,6 @@ features = ["derive"]
 
 [build-dependencies]
 pyo3-build-config = "0.21"
+
+[patch.crates-io]
+fit = { path = "vendor/fit" }

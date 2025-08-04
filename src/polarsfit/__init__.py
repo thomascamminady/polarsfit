@@ -180,6 +180,8 @@ def read_data(
 def scan_recordmesgs(
     file_path: str,
     field_mapping: dict[str, str] | None = None,
+    *,
+    apply_default_mapping: bool = True,
 ) -> pl.LazyFrame:
     """
     Create a lazy scanner for record messages from a FIT file.
@@ -191,6 +193,7 @@ def scan_recordmesgs(
     Args:
         file_path: Path to the FIT file
         field_mapping: Optional mapping of field names to rename columns
+        apply_default_mapping: Whether to apply default FIT protocol field mapping
 
     Returns
     -------
@@ -201,13 +204,15 @@ def scan_recordmesgs(
         >>> # No file reading has occurred yet
         >>> result = lf.filter(pl.col("heart_rate") > 150).collect()  # File read here
     """
-    return _create_lazy_scanner(file_path, "record", field_mapping)
+    return _create_lazy_scanner(file_path, "record", field_mapping, apply_default_mapping)
 
 
 def scan_data(
     file_path: str,
     message_type: str,
     field_mapping: dict[str, str] | None = None,
+    *,
+    apply_default_mapping: bool = True,
 ) -> pl.LazyFrame:
     """
     Create a lazy scanner for specific message type data from a FIT file.
@@ -220,6 +225,7 @@ def scan_data(
         file_path: Path to the FIT file
         message_type: Type of message to scan (e.g., "record", "session", "lap")
         field_mapping: Optional mapping of field names to rename columns
+        apply_default_mapping: Whether to apply default FIT protocol field mapping
 
     Returns
     -------
@@ -230,29 +236,33 @@ def scan_data(
         >>> # No file reading has occurred yet
         >>> result = lf.select(["timestamp", "heart_rate", "power"]).collect()  # File read here
     """
-    return _create_lazy_scanner(file_path, message_type, field_mapping)
+    return _create_lazy_scanner(file_path, message_type, field_mapping, apply_default_mapping)
 
 
-def _create_lazy_scanner(file_path: str, message_type: str, field_mapping: dict[str, str] | None = None) -> pl.LazyFrame:
+def _create_lazy_scanner(
+    file_path: str,
+    message_type: str,
+    field_mapping: dict[str, str] | None = None,
+    apply_default_mapping: bool = True,
+) -> pl.LazyFrame:
     """
     Create a truly lazy scanner that defers file reading until materialization.
 
     This works by creating a LazyFrame from a function that reads the data only when called.
     """
+
     # We create a function that will be called when the LazyFrame is materialized
     def read_fit_data():
         if message_type == "record":
-            return read_recordmesgs(file_path, field_mapping)
+            return read_recordmesgs(file_path, field_mapping, apply_default_mapping=apply_default_mapping)
         else:
-            return read_data(file_path, message_type, field_mapping)
+            return read_data(file_path, message_type, field_mapping, apply_default_mapping=apply_default_mapping)
 
     # Create a small dummy DataFrame to start the lazy chain
     # The actual reading happens in the map operation
     dummy_df = pl.DataFrame({"_temp": [1]})
 
-    return dummy_df.lazy().map_batches(
-        lambda _: read_fit_data()
-    )
+    return dummy_df.lazy().map_batches(lambda _: read_fit_data())
 
 
 __all__ = [

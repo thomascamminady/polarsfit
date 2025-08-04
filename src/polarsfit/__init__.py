@@ -182,10 +182,11 @@ def scan_recordmesgs(
     field_mapping: dict[str, str] | None = None,
 ) -> pl.LazyFrame:
     """
-    Scan record messages from a FIT file and return a LazyFrame for efficient processing.
+    Create a lazy scanner for record messages from a FIT file.
 
-    This function provides lazy evaluation, which means the data is not loaded into memory
-    until a computation is triggered (e.g., .collect(), .head(), etc.).
+    This function returns a LazyFrame that defers file reading until operations
+    are actually executed. The file is only read when you call .collect(), .head(),
+    or other materializing operations.
 
     Args:
         file_path: Path to the FIT file
@@ -193,15 +194,14 @@ def scan_recordmesgs(
 
     Returns
     -------
-        A Polars LazyFrame containing the record messages
+        A Polars LazyFrame that will read the record messages when materialized
 
     Example:
         >>> lf = scan_recordmesgs("activity.fit")
-        >>> result = lf.filter(pl.col("heart_rate") > 150).collect()
+        >>> # No file reading has occurred yet
+        >>> result = lf.filter(pl.col("heart_rate") > 150).collect()  # File read here
     """
-    # Get the DataFrame using the existing read function which handles field mapping
-    df = read_recordmesgs(file_path, field_mapping)
-    return df.lazy()
+    return _create_lazy_scanner(file_path, "record", field_mapping)
 
 
 def scan_data(
@@ -210,10 +210,11 @@ def scan_data(
     field_mapping: dict[str, str] | None = None,
 ) -> pl.LazyFrame:
     """
-    Scan specific message type data from a FIT file and return a LazyFrame for efficient processing.
+    Create a lazy scanner for specific message type data from a FIT file.
 
-    This function provides lazy evaluation, which means the data is not loaded into memory
-    until a computation is triggered (e.g., .collect(), .head(), etc.).
+    This function returns a LazyFrame that defers file reading until operations
+    are actually executed. The file is only read when you call .collect(), .head(),
+    or other materializing operations.
 
     Args:
         file_path: Path to the FIT file
@@ -222,15 +223,36 @@ def scan_data(
 
     Returns
     -------
-        A Polars LazyFrame containing the specified message type data
+        A Polars LazyFrame that will read the specified message type data when materialized
 
     Example:
         >>> lf = scan_data("activity.fit", "record")
-        >>> result = lf.select(["timestamp", "heart_rate", "power"]).collect()
+        >>> # No file reading has occurred yet
+        >>> result = lf.select(["timestamp", "heart_rate", "power"]).collect()  # File read here
     """
-    # Get the DataFrame using the existing read function which handles field mapping
-    df = read_data(file_path, message_type, field_mapping)
-    return df.lazy()
+    return _create_lazy_scanner(file_path, message_type, field_mapping)
+
+
+def _create_lazy_scanner(file_path: str, message_type: str, field_mapping: dict[str, str] | None = None) -> pl.LazyFrame:
+    """
+    Create a truly lazy scanner that defers file reading until materialization.
+
+    This works by creating a LazyFrame from a function that reads the data only when called.
+    """
+    # We create a function that will be called when the LazyFrame is materialized
+    def read_fit_data():
+        if message_type == "record":
+            return read_recordmesgs(file_path, field_mapping)
+        else:
+            return read_data(file_path, message_type, field_mapping)
+
+    # Create a small dummy DataFrame to start the lazy chain
+    # The actual reading happens in the map operation
+    dummy_df = pl.DataFrame({"_temp": [1]})
+
+    return dummy_df.lazy().map_batches(
+        lambda _: read_fit_data()
+    )
 
 
 __all__ = [

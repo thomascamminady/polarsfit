@@ -14,7 +14,7 @@ pub fn read_recordmesgs(file_path: &str, field_mapping: Option<HashMap<String, S
 }
 
 /// Scan record messages from a .fit file and return as a Polars LazyFrame
-/// with optional field mapping
+/// Note: File reading occurs immediately, but operations are lazy
 #[pyfunction]
 #[pyo3(signature = (file_path, field_mapping = None))]
 pub fn scan_recordmesgs(file_path: &str, field_mapping: Option<HashMap<String, String>>) -> PyResult<PyLazyFrame> {
@@ -49,7 +49,7 @@ pub fn read_data(file_path: &str, message_type: &str, field_mapping: Option<Hash
 }
 
 /// Scan messages of a specific type from a .fit file and return as a Polars LazyFrame
-/// with optional field mapping
+/// Note: File reading occurs immediately, but operations are lazy
 #[pyfunction]
 #[pyo3(signature = (file_path, message_type, field_mapping = None))]
 pub fn scan_data(file_path: &str, message_type: &str, field_mapping: Option<HashMap<String, String>>) -> PyResult<PyLazyFrame> {

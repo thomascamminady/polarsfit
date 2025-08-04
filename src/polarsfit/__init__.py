@@ -204,7 +204,9 @@ def scan_recordmesgs(
         >>> # No file reading has occurred yet
         >>> result = lf.filter(pl.col("heart_rate") > 150).collect()  # File read here
     """
-    return _create_lazy_scanner(file_path, "record", field_mapping, apply_default_mapping)
+    return _create_lazy_scanner(
+        file_path, "record", field_mapping, apply_default_mapping
+    )
 
 
 def scan_data(
@@ -236,7 +238,9 @@ def scan_data(
         >>> # No file reading has occurred yet
         >>> result = lf.select(["timestamp", "heart_rate", "power"]).collect()  # File read here
     """
-    return _create_lazy_scanner(file_path, message_type, field_mapping, apply_default_mapping)
+    return _create_lazy_scanner(
+        file_path, message_type, field_mapping, apply_default_mapping
+    )
 
 
 def _create_lazy_scanner(
@@ -254,9 +258,18 @@ def _create_lazy_scanner(
     # We create a function that will be called when the LazyFrame is materialized
     def read_fit_data():
         if message_type == "record":
-            return read_recordmesgs(file_path, field_mapping, apply_default_mapping=apply_default_mapping)
+            return read_recordmesgs(
+                file_path,
+                field_mapping,
+                apply_default_mapping=apply_default_mapping,
+            )
         else:
-            return read_data(file_path, message_type, field_mapping, apply_default_mapping=apply_default_mapping)
+            return read_data(
+                file_path,
+                message_type,
+                field_mapping,
+                apply_default_mapping=apply_default_mapping,
+            )
 
     # Create a small dummy DataFrame to start the lazy chain
     # The actual reading happens in the map operation

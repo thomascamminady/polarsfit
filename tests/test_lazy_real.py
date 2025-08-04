@@ -25,7 +25,7 @@ def test_lazy_loading():
     create_time = time.time() - start_time
     print(f"   ✓ LazyFrame created in {create_time:.4f}s")
     print(f"   ✓ Type: {type(lf)}")
-    print(f"   ✓ No file was read (file doesn't exist but no error yet)")
+    print("   ✓ No file was read (file doesn't exist but no error yet)")
 
     # Test 2: Adding operations should still be lazy
     print("\n2. Adding lazy operations (should still be instant)...")
@@ -39,16 +39,16 @@ def test_lazy_loading():
 
     ops_time = time.time() - start_time
     print(f"   ✓ Lazy operations added in {ops_time:.4f}s")
-    print(f"   ✓ Still no file reading occurred")
+    print("   ✓ Still no file reading occurred")
 
     # Test 3: Only when collecting should it try to read
     print("\n3. Collecting data (now file reading should occur and fail)...")
     try:
         result = lazy_with_ops.collect()
         print("   ✗ Unexpected: Should have failed!")
-    except Exception as e:
-        print(f"   ✓ Expected error on collect: File not found")
-        print(f"   ✓ This proves file reading is deferred until collection")
+    except Exception:
+        print("   ✓ Expected error on collect: File not found")
+        print("   ✓ This proves file reading is deferred until collection")
 
     print("\n" + "=" * 50)
     print("CONCLUSION: TRUE LAZY EVALUATION CONFIRMED!")

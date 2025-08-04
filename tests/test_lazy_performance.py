@@ -1,5 +1,5 @@
-"""
-Performance comparison tests for lazy vs eager evaluation.
+"""Performance comparison tests for lazy vs eager evaluation.
+
 This creates real scenarios to measure the efficiency gains.
 """
 
@@ -238,7 +238,7 @@ class TestLazyPerformance:
         frames_per_thread = 50
 
         start_time = time.time()
-        for i in range(num_threads):
+        for _ in range(num_threads):
             thread = threading.Thread(
                 target=create_lazy_frames,
                 args=(frames_per_thread, result_queue),

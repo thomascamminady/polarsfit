@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-"""
-Test truly lazy FIT file reading.
-"""
+"""Test truly lazy FIT file reading."""
 
 import time
 
@@ -44,7 +42,7 @@ def test_lazy_loading():
     # Test 3: Only when collecting should it try to read
     print("\n3. Collecting data (now file reading should occur and fail)...")
     try:
-        result = lazy_with_ops.collect()
+        lazy_with_ops.collect()
         print("   ✗ Unexpected: Should have failed!")
     except Exception:
         print("   ✓ Expected error on collect: File not found")

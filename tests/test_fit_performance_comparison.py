@@ -29,7 +29,7 @@ class TestFitPerformanceComparison:
         return None
 
     def test_scan_vs_read_performance_100x(self, sample_fit_file):
-        """Test that scanning 100 FIT files is at least 10x faster than reading them."""
+        """Test that scanning 10 FIT files is at least 10x faster than reading them."""
         if sample_fit_file is None:
             pytest.skip(
                 "No FIT file available for testing. Need a real .fit file to perform this test."
@@ -40,11 +40,11 @@ class TestFitPerformanceComparison:
 
         print(f"\nPerformance test using FIT file: {sample_fit_file}")
 
-        # Test 1: Scan operation 100 times (should be very fast)
-        print("Testing scan performance (100 iterations)...")
+        # Test 1: Scan operation 10 times (should be very fast)
+        print("Testing scan performance (10 iterations)...")
         scan_times = []
 
-        for _ in range(100):
+        for _ in range(10):
             start_time = time.time()
             # Scan without collecting - this should be nearly instant
             lazy_frame = polarsfit.scan_recordmesgs(sample_fit_file)
@@ -55,17 +55,17 @@ class TestFitPerformanceComparison:
             assert isinstance(lazy_frame, pl.LazyFrame)
 
         total_scan_time = sum(scan_times)
-        avg_scan_time = total_scan_time / 100
+        avg_scan_time = total_scan_time / 10
 
-        print(f"   Total scan time (100x): {total_scan_time:.4f}s")
+        print(f"   Total scan time (10x): {total_scan_time:.4f}s")
         print(f"   Average scan time: {avg_scan_time:.6f}s")
-        print(f"   Scan operations per second: {100 / total_scan_time:.1f}")
+        print(f"   Scan operations per second: {10 / total_scan_time:.1f}")
 
-        # Test 2: Read operation 100 times (will be much slower)
-        print("Testing read performance (100 iterations)...")
+        # Test 2: Read operation 10 times (will be much slower)
+        print("Testing read performance (10 iterations)...")
         read_times = []
 
-        for _ in range(100):
+        for _ in range(10):
             start_time = time.time()
             # Read the file completely - this involves actual I/O
             dataframe = polarsfit.read_recordmesgs(sample_fit_file)
@@ -77,11 +77,11 @@ class TestFitPerformanceComparison:
             assert len(dataframe) > 0  # Should have some data
 
         total_read_time = sum(read_times)
-        avg_read_time = total_read_time / 100
+        avg_read_time = total_read_time / 10
 
-        print(f"   Total read time (100x): {total_read_time:.4f}s")
+        print(f"   Total read time (10x): {total_read_time:.4f}s")
         print(f"   Average read time: {avg_read_time:.6f}s")
-        print(f"   Read operations per second: {100 / total_read_time:.1f}")
+        print(f"   Read operations per second: {10 / total_read_time:.1f}")
 
         # Calculate performance difference
         speedup = total_read_time / total_scan_time

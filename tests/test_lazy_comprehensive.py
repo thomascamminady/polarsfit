@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-"""
-Comprehensive test demonstrating lazy evaluation benefits.
-"""
+"""Comprehensive test demonstrating lazy evaluation benefits."""
 
 import time
 
@@ -45,9 +43,9 @@ def test_lazy_is_truly_lazy():
     # Test 3: Error only on materialization
     print("\n3. Error Handling (Deferred Until Collection):")
     try:
-        result = chained.collect()
+        chained.collect()
         print("   ✗ FAIL: Should have errored!")
-        assert False, "Expected file not found error"
+        raise AssertionError("Expected file not found error")
     except Exception as e:
         print("   File read attempted only on .collect()")
         print(f"   Error: {type(e).__name__}")
@@ -178,7 +176,7 @@ def test_lazy_benefits_summary():
 
     # Measure chaining speed
     start = time.time()
-    chained = (
+    (
         lf.filter(pl.col("hr") > 100).select(["timestamp", "hr"]).limit(50)
     )
     chain_time = time.time() - start

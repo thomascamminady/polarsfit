@@ -1,6 +1,4 @@
-"""
-Correctness tests to ensure lazy evaluation produces identical results to eager evaluation.
-"""
+"""Correctness tests to ensure lazy evaluation produces identical results to eager evaluation."""
 
 import polars as pl
 import pytest

@@ -610,7 +610,9 @@ dependencies = [
 
 [[package]]
 name = "fitsdk"
-version = "0.1.6"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a038fd8228968975abd1ee63ed6a1db10acb13c1e92af9d5a362b792c2d0e7a7"
 
 [[package]]
 name = "flate2"
@@ -2237,11 +2239,13 @@ version = "0.18.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "08d315add0412858cb21d45f0a48d68974d32f5f93f92fd9cedc95102ea011d1"
 dependencies = [
+ "ciborium",
  "libc",
  "once_cell",
  "polars",
  "polars-core",
  "polars-ffi",
+ "polars-lazy",
  "polars-plan",
  "pyo3",
  "pyo3-polars-derive",

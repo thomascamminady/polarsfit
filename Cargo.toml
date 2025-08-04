@@ -17,7 +17,7 @@ thiserror = "1.0"
 
 [dependencies.pyo3-polars]
 version = "0.18"
-features = ["derive"]
+features = ["derive", "lazy"]
 
 [build-dependencies]
 pyo3-build-config = "0.21"

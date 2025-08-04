@@ -171,3 +171,4 @@ data/.gitkeep
 data/
 poetry.toml
 ideation/
+vendor/

@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 use pyo3::prelude::*;
-use pyo3_polars::PyDataFrame;
+use pyo3_polars::{PyDataFrame, PyLazyFrame};
 use polars::prelude::*;
 use fit::{Fit, Value};
 use std::collections::HashMap;
@@ -11,6 +11,15 @@ use std::collections::HashMap;
 #[pyo3(signature = (file_path, field_mapping = None))]
 pub fn read_recordmesgs(file_path: &str, field_mapping: Option<HashMap<String, String>>) -> PyResult<PyDataFrame> {
     read_generic_messages(file_path, "record", field_mapping)
+}
+
+/// Scan record messages from a .fit file and return as a Polars LazyFrame
+/// with optional field mapping
+#[pyfunction]
+#[pyo3(signature = (file_path, field_mapping = None))]
+pub fn scan_recordmesgs(file_path: &str, field_mapping: Option<HashMap<String, String>>) -> PyResult<PyLazyFrame> {
+    let df = read_generic_messages(file_path, "record", field_mapping)?;
+    Ok(PyLazyFrame(df.0.lazy()))
 }
 
 /// Get all available message types in a FIT file
@@ -37,6 +46,15 @@ pub fn get_message_types(file_path: &str) -> PyResult<Vec<String>> {
 #[pyo3(signature = (file_path, message_type, field_mapping = None))]
 pub fn read_data(file_path: &str, message_type: &str, field_mapping: Option<HashMap<String, String>>) -> PyResult<PyDataFrame> {
     read_generic_messages(file_path, message_type, field_mapping)
+}
+
+/// Scan messages of a specific type from a .fit file and return as a Polars LazyFrame
+/// with optional field mapping
+#[pyfunction]
+#[pyo3(signature = (file_path, message_type, field_mapping = None))]
+pub fn scan_data(file_path: &str, message_type: &str, field_mapping: Option<HashMap<String, String>>) -> PyResult<PyLazyFrame> {
+    let df = read_generic_messages(file_path, message_type, field_mapping)?;
+    Ok(PyLazyFrame(df.0.lazy()))
 }
 
 /// Internal function to read generic messages from a FIT file

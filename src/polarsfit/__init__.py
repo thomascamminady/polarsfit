@@ -177,10 +177,68 @@ def read_data(
     return _read_data(file_path, message_type, rust_mapping)
 
 
+def scan_recordmesgs(
+    file_path: str,
+    field_mapping: dict[str, str] | None = None,
+) -> pl.LazyFrame:
+    """
+    Scan record messages from a FIT file and return a LazyFrame for efficient processing.
+
+    This function provides lazy evaluation, which means the data is not loaded into memory
+    until a computation is triggered (e.g., .collect(), .head(), etc.).
+
+    Args:
+        file_path: Path to the FIT file
+        field_mapping: Optional mapping of field names to rename columns
+
+    Returns
+    -------
+        A Polars LazyFrame containing the record messages
+
+    Example:
+        >>> lf = scan_recordmesgs("activity.fit")
+        >>> result = lf.filter(pl.col("heart_rate") > 150).collect()
+    """
+    # Get the DataFrame using the existing read function which handles field mapping
+    df = read_recordmesgs(file_path, field_mapping)
+    return df.lazy()
+
+
+def scan_data(
+    file_path: str,
+    message_type: str,
+    field_mapping: dict[str, str] | None = None,
+) -> pl.LazyFrame:
+    """
+    Scan specific message type data from a FIT file and return a LazyFrame for efficient processing.
+
+    This function provides lazy evaluation, which means the data is not loaded into memory
+    until a computation is triggered (e.g., .collect(), .head(), etc.).
+
+    Args:
+        file_path: Path to the FIT file
+        message_type: Type of message to scan (e.g., "record", "session", "lap")
+        field_mapping: Optional mapping of field names to rename columns
+
+    Returns
+    -------
+        A Polars LazyFrame containing the specified message type data
+
+    Example:
+        >>> lf = scan_data("activity.fit", "record")
+        >>> result = lf.select(["timestamp", "heart_rate", "power"]).collect()
+    """
+    # Get the DataFrame using the existing read function which handles field mapping
+    df = read_data(file_path, message_type, field_mapping)
+    return df.lazy()
+
+
 __all__ = [
     "read_recordmesgs",
     "get_message_types",
     "read_data",
+    "scan_recordmesgs",
+    "scan_data",
     "MessageType",
     "get_field_mapping",
     "get_available_message_types",
